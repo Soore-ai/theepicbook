@@ -34,9 +34,9 @@
   shell: cd {{ app_dest }} && npm install
 
 - name: Install PM2 globally
-  community.general.npm:
-    name: pm2
-    global: yes
+  shell: npm install -g pm2
+  args:
+    creates: /usr/local/bin/pm2
 
 - name: Start EpicBook app with PM2
   shell: |
