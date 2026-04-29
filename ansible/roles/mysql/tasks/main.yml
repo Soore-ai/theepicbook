@@ -1,4 +1,14 @@
 ---
+- name: Mark app directory as safe for git
+  command: git config --global --add safe.directory {{ app_dest }}
+
+- name: Clone app repo to get database schema
+  git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_dest }}"
+    accept_hostkey: yes
+    force: yes
+
 - name: Install MySQL server
   apt:
     name: mysql-server
@@ -21,7 +31,7 @@
 - name: Create application database
   shell: |
     mysql -u root -p{{ db_password }} -e "CREATE DATABASE IF NOT EXISTS {{ db_name }};"
-  
+
 - name: Import database schema
   shell: |
     mysql -u root -p{{ db_password }} {{ db_name }} < {{ app_dest }}/db/BuyTheBook_Schema.sql
