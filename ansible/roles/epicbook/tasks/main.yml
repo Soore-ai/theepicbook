@@ -1,0 +1,46 @@
+---
+- name: Mark app directory as safe for git
+  command: git config --global --add safe.directory {{ app_dest }}
+
+- name: Clone the EpicBook repository
+  git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_dest }}"
+    accept_hostkey: yes
+    force: yes
+  notify: reload nginx
+
+- name: Set ownership of app files
+  file:
+    path: "{{ app_dest }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    recurse: yes
+
+- name: Set directory permissions
+  file:
+    path: "{{ app_dest }}"
+    mode: '0755'
+    recurse: yes
+
+- name: Install Node.js
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    apt-get install -y nodejs
+  args:
+    creates: /usr/bin/node
+
+- name: Install npm dependencies
+  shell: cd {{ app_dest }} && npm install
+
+- name: Install PM2 globally
+  community.general.npm:
+    name: pm2
+    global: yes
+
+- name: Start EpicBook app with PM2
+  shell: |
+    cd {{ app_dest }}
+    pm2 delete epicbook || true
+    pm2 start server.js --name epicbook
+    pm2 save

@@ -1,0 +1,7 @@
+app_repo: "https://github.com/Soore-ai/theepicbook.git"
+app_dest: "/var/www/epicbook"
+app_user: "www-data"
+db_name: "bookstore"
+db_user: "epicadmin"
+db_password: "EpicBook2026!"
+db_host: "MYSQL_FQDN"
